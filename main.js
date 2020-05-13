@@ -4,7 +4,7 @@ const clientSecret = 'XI1LHWZZMEOVCCJVYRQPELVHA3MTTWXZOAWGPDQEXXICTYAG';
 const url = 'https://api.foursquare.com/v2/venues/explore?near=';
 
 // OpenWeather Info
-const openWeatherKey = '45dc1d2e92f646d108fe518401d1e210';
+const openWeatherKey = '3f7ff6c50748a60b4491e44faaa808ca';
 const weatherUrl = 'https://api.openweathermap.org/data/2.5/weather';
 
 // Page Elements
@@ -26,15 +26,25 @@ const getVenues = async () => {
       const jsonResponse = await response.json();
       const venues = jsonResponse.response.groups[0].items.map(x => x.venue);
       console.log(venues);
-     // return venues;
+      return venues;
     }
   }catch(error){
     console.log(error);
   }
 }
 
-const getForecast = () => {
-
+const getForecast = async () => {
+  const urlToFetch = `${weatherUrl}?q=${$input.val()}&APPID=${openWeatherKey}`;
+  try {
+  const response = await fetch(urlToFetch);
+  if (response.ok) {
+    const jsonResponse = await response.json();
+    console.log(jsonResponse);
+    return jsonResponse;
+    }
+  } catch(error){
+    console.log(error);
+    }
 }
 
 
@@ -42,8 +52,11 @@ const getForecast = () => {
 const renderVenues = (venues) => {
   $venueDivs.forEach(($venue, index) => {
     // Add your code here:
-
-    let venueContent = '';
+    const venue = venues[index];
+      const venueIcon = venue.categories[0].icon;
+      console.log(venueIcon);
+      const venueImgSrc = `${venueIcon.prefix}bg_64${venueIcon.suffix}`;
+      let venueContent = createVenueHTML(venue.name, venue.location, venueImgSrc);
     $venue.append(venueContent);
   });
   $destination.append(`<h2>${venues[0].location.city}</h2>`);
@@ -61,7 +74,7 @@ const executeSearch = () => {
   $weatherDiv.empty();
   $destination.empty();
   $container.css("visibility", "visible");
-  getVenues()
+  getVenues().then(venues => renderVenues(venues));
   getForecast()
   return false;
 }
