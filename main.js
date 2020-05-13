@@ -33,8 +33,29 @@ const getVenues = async () => {
   }
 }
 
+//shuffles items in an array
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
+
 const getForecast = async () => {
-  const urlToFetch = `${weatherUrl}?q=${$input.val()}&APPID=${openWeatherKey}`;
+  const urlToFetch = `${weatherUrl}?q=${$input.val()}&units=metric&APPID=${openWeatherKey}`;
   try {
   const response = await fetch(urlToFetch);
   if (response.ok) {
@@ -50,6 +71,9 @@ const getForecast = async () => {
 
 // Render functions
 const renderVenues = (venues) => {
+  // Randomizes venues
+  shuffle(venues);
+
   $venueDivs.forEach(($venue, index) => {
     // Add your code here:
     const venue = venues[index];
